@@ -31,7 +31,7 @@ define('GPWD', 'senha');		// <-- Insira aqui a senha do seu GMail
 
 function smtpmailer($para, $de, $de_nome, $assunto, $corpo) { 
 	global $error;
-	$mail = new PHPMailer();
+	$mail = new PHPMailer(true);
 	$mail->IsSMTP();		// Ativar SMTP
 	$mail->SMTPDebug = 0;		// Debugar: 1 = erros e mensagens, 2 = mensagens apenas
 	$mail->SMTPAuth = true;		// Autenticação ativada
