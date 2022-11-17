@@ -7,9 +7,9 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require './vendor/phpmailer/phpmailer/src/Exception.php';
-require './vendor/phpmailer/phpmailer/src/PHPMailer.php';
-require './vendor/phpmailer/phpmailer/src/SMTP.php';
+require './PHPMailer-master/src/Exception.php';
+require './PHPMailer-master/src/PHPMailer.php';
+require './PHPMailer-master/src/SMTP.php';
 
 
 $Nome		= $_POST["Nome"];	// Pega o valor do campo Nome
@@ -21,7 +21,7 @@ $Mensagem	= $_POST["Mensagem"];	// Pega os valores do campo Mensagem
 
 $Vai 		= "Nome: $Nome\n\nE-mail: $Email\n\nTelefone: $Fone\n\nMensagem: $Mensagem\n";
 
-require './vendor/autoload.php';
+
 
 define('GUSER', 'enviador@gmail.com');	// <-- Insira aqui o seu GMail
 define('GPWD', 'senha');		// <-- Insira aqui a senha do seu GMail
