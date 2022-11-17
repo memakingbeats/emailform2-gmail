@@ -1,67 +1,112 @@
 <?php
 
+/**
+ * This example shows settings to use when sending via Google's Gmail servers.
+ * This uses traditional id & password authentication - look at the gmail_xoauth.phps
+ * example to see how to use XOAUTH2.
+ * The IMAP section shows how to save this message to the 'Sent Mail' folder using IMAP commands.
+ */
 
-
-
-// Importar as classes 
+//Import PHPMailer classes into the global namespace
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;
 
-require './PHPMailer-master/src/Exception.php';
-require './PHPMailer-master/src/PHPMailer.php';
-require './PHPMailer-master/src/SMTP.php';
+require './Email_PHP/vendor/autoload.php';
+require './Email_PHP/vendor/phpmailer/phpmailer/src/PHPMailer.php';
+require './Email_PHP/vendor/phpmailer/phpmailer/src/Exception.php';
+require './Email_PHP/vendor/phpmailer/phpmailer/src/SMTP.php';
+require './Email_PHP/vendor/phpmailer/phpmailer/src/POP3.php';
 
+//Create a new PHPMailer instance
+$mail = new PHPMailer();
 
-$Nome		= $_POST["Nome"];	// Pega o valor do campo Nome
-$Fone		= $_POST["Fone"];	// Pega o valor do campo Telefone
-$Email		= $_POST["Email"];	// Pega o valor do campo Email
-$Mensagem	= $_POST["Mensagem"];	// Pega os valores do campo Mensagem
+//Tell PHPMailer to use SMTP
+$mail->isSMTP();
 
-// Variável que junta os valores acima e monta o corpo do email
+//Enable SMTP debugging
+//SMTP::DEBUG_OFF = off (for production use)
+//SMTP::DEBUG_CLIENT = client messages
+//SMTP::DEBUG_SERVER = client and server messages
+$mail->SMTPDebug = SMTP::DEBUG_SERVER;
 
-$Vai 		= "Nome: $Nome\n\nE-mail: $Email\n\nTelefone: $Fone\n\nMensagem: $Mensagem\n";
+//Set the hostname of the mail server
+$mail->Host = 'smtp.gmail.com';
+//Use `$mail->Host = gethostbyname('smtp.gmail.com');`
+//if your network does not support SMTP over IPv6,
+//though this may cause issues with TLS
 
+//Set the SMTP port number:
+// - 465 for SMTP with implicit TLS, a.k.a. RFC8314 SMTPS or
+// - 587 for SMTP+STARTTLS
+$mail->Port = 465;
 
+//Set the encryption mechanism to use:
+// - SMTPS (implicit TLS on port 465) or
+// - STARTTLS (explicit TLS on port 587)
+$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
 
-define('GUSER', 'enviador@gmail.com');	// <-- Insira aqui o seu GMail
-define('GPWD', 'senha');		// <-- Insira aqui a senha do seu GMail
+//Whether to use SMTP authentication
+$mail->SMTPAuth = true;
 
-function smtpmailer($para, $de, $de_nome, $assunto, $corpo) { 
-	global $error;
-	$mail = new PHPMailer();
-	$mail->IsSMTP();		// Ativar SMTP
-	$mail->SMTPDebug = 0;		// Debugar: 1 = erros e mensagens, 2 = mensagens apenas
-	$mail->SMTPAuth = true;		// Autenticação ativada
-	$mail->SMTPSecure = 'ssl';	// SSL REQUERIDO pelo GMail
-	$mail->Host = 'smtp.gmail.com';	// SMTP utilizado
-	$mail->Port = 587;  		// A porta 587 deverá estar aberta em seu servidor
-	$mail->Username = GUSER;
-	$mail->Password = GPWD;
-	$mail->SetFrom($de, $de_nome);
-	$mail->Subject = $assunto;
-	$mail->Body = $corpo;
-	$mail->AddAddress($para);
-	if(!$mail->Send()) {
-		$error = 'Mail error: '.$mail->ErrorInfo; 
-		return false;
-	} else {
-		$error = 'Mensagem enviada!';
-		return true;
-	}
+//Username to use for SMTP authentication - use full email address for gmail
+$mail->Username = 'cafestg@gmail.com';
+
+//Password to use for SMTP authentication
+$mail->Password = 'zoucdyomghpidexh';
+
+//Set who the message is to be sent from
+//Note that with gmail you can only use your account address (same as `Username`)
+//or predefined aliases that you have configured within your account.
+//Do not use user-submitted addresses in here
+$mail->setFrom('cafestg@gmail.com', 'Rafael Teixeira');
+
+//Set an alternative reply-to address
+//This is a good place to put user-submitted addresses
+$mail->addReplyTo('rafa.lionb@gmail.com', 'First Last');
+
+//Set who the message is to be sent to
+$mail->addAddress('memakingbeats@gmail.com', 'memaking beats');
+
+//Set the subject line
+$mail->Subject = 'PHPMailer GMail SMTP test';
+
+//Read an HTML message body from an external file, convert referenced images to embedded,
+//convert HTML into a basic plain-text alternative body
+$mail->msgHTML(file_get_contents('emailescrito.html'), __DIR__);
+
+//Replace the plain text body with one created manually
+$mail->AltBody = 'This is a plain-text message body';
+
+//Attach an image file
+$mail->addAttachment('images/phpmailer_mini.png');
+
+//send the message, check for errors
+if (!$mail->send()) {
+    echo 'Mailer Error: ' . $mail->ErrorInfo;
+} else {
+    echo 'Message sent!';
+    //Section 2: IMAP
+    //Uncomment these to save your message in the 'Sent Mail' folder.
+    #if (save_mail($mail)) {
+    #    echo "Message saved!";
+    #}
 }
 
-// Insira abaixo o email que irá receber a mensagem, o email que irá enviar (o mesmo da variável GUSER), 
+//Section 2: IMAP
+//IMAP commands requires the PHP IMAP Extension, found at: https://php.net/manual/en/imap.setup.php
+//Function to call which uses the PHP imap_*() functions to save messages: https://php.net/manual/en/book.imap.php
+//You can use imap_getmailboxes($imapStream, '/imap/ssl', '*' ) to get a list of available folders or labels, this can
+//be useful if you are trying to get this working on a non-Gmail IMAP server.
+function save_mail($mail)
+{
+    //You can change 'Sent Mail' to any other folder or tag
+    $path = '{imap.gmail.com:993/imap/ssl}[Gmail]/Sent Mail';
 
+    //Tell your server to open an IMAP connection using the same username and password as you used for SMTP
+    $imapStream = imap_open($path, $mail->Username, $mail->Password);
 
- if (smtpmailer('cafestg@gmail.com.br', 'enviador@gmail.com', 'Nome do Enviador', 'Assunto do Email', $Vai)) {
+    $result = imap_append($imapStream, $path, $mail->getSentMIMEMessage());
+    imap_close($imapStream);
 
-	Header("location:http://www.dominio.com.br/obrigado.html"); // Redireciona para uma página de obrigado.
-
+    return $result;
 }
-die();
-if (!empty($error)) echo $error;
-?>
-Pronto, agora salve o arquivo com o formulário HTML e o enviar.php
-
-Lembre-se que estes 2 arquivos deverão estar fora da pasta phpmailer no exemplo acima, mas caso deseje você pode alterar os nomes dos arquivos e pastas, apenas atente-se para estas duas partes do código:
-

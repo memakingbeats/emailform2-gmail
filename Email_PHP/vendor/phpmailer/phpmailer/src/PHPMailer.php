@@ -4186,7 +4186,6 @@ class PHPMailer
      * @param string      $name  Custom header name
      * @param string|null $value Header value
      *
-     * @return bool True if a header was set successfully
      * @throws Exception
      */
     public function addCustomHeader($name, $value = null)
