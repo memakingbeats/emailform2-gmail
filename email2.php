@@ -52,7 +52,7 @@ $mail->SMTPAuth = true;
 $mail->Username = 'cafestg@gmail.com';
 
 //Password to use for SMTP authentication
-$mail->Password = 'gkjgakdgfka';
+$mail->Password = 'zoucdyomghpidexh';
 
 //Set who the message is to be sent from
 //Note that with gmail you can only use your account address (same as `Username`)
@@ -62,7 +62,7 @@ $mail->setFrom('cafestg@gmail.com', 'Rafael Teixeira');
 
 //Set an alternative reply-to address
 //This is a good place to put user-submitted addresses
-$mail->addReplyTo('rafa.lionb@gmail.com', 'First Last');
+$mail->addReplyTo('rafa.lionb@gmail.com', 'rafael fava');
 
 //Set who the message is to be sent to
 $mail->addAddress('memakingbeats@gmail.com', 'memaking beats');
