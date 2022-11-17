@@ -1,18 +1,15 @@
 <?php
 
 
- header('charset=utf-8');
-
 
 
 // Importar as classes 
 use PHPMailer\PHPMailer\PHPMailer;
-  use PHPMailer\PHPMailer\Exception;
-  use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
-  require 'vendor/phpmailer/phpmailer/src/Exception.php';
-  require 'vendor/phpmailer/phpmailer/src/PHPMailer.php';
-  require 'vendor/phpmailer/phpmailer/src/SMTP.php';
+require './vendor/phpmailer/phpmailer/src/Exception.php';
+require './vendor/phpmailer/phpmailer/src/PHPMailer.php';
+require './vendor/phpmailer/phpmailer/src/SMTP.php';
 
 
 $Nome		= $_POST["Nome"];	// Pega o valor do campo Nome
@@ -26,7 +23,7 @@ $Vai 		= "Nome: $Nome\n\nE-mail: $Email\n\nTelefone: $Fone\n\nMensagem: $Mensage
 
 require './vendor/autoload.php';
 
-define('GUSER', 'remetente@gmail.com');	// <-- Insira aqui o seu GMail
+define('GUSER', 'enviador@gmail.com');	// <-- Insira aqui o seu GMail
 define('GPWD', 'senha');		// <-- Insira aqui a senha do seu GMail
 
 function smtpmailer($para, $de, $de_nome, $assunto, $corpo) { 
@@ -35,9 +32,9 @@ function smtpmailer($para, $de, $de_nome, $assunto, $corpo) {
 	$mail->IsSMTP();		// Ativar SMTP
 	$mail->SMTPDebug = 0;		// Debugar: 1 = erros e mensagens, 2 = mensagens apenas
 	$mail->SMTPAuth = true;		// Autenticação ativada
-	$mail->SMTPSecure = 'tls';	// SSL REQUERIDO pelo GMail
+	$mail->SMTPSecure = 'ssl';	// SSL REQUERIDO pelo GMail
 	$mail->Host = 'smtp.gmail.com';	// SMTP utilizado
-	$mail->Port = 465;  		// A porta 587 deverá estar aberta em seu servidor
+	$mail->Port = 587;  		// A porta 587 deverá estar aberta em seu servidor
 	$mail->Username = GUSER;
 	$mail->Password = GPWD;
 	$mail->SetFrom($de, $de_nome);
@@ -56,7 +53,7 @@ function smtpmailer($para, $de, $de_nome, $assunto, $corpo) {
 // Insira abaixo o email que irá receber a mensagem, o email que irá enviar (o mesmo da variável GUSER), 
 
 
- if (smtpmailer('cafestg@gmail.com.br', 'rafa.lionb@gmail.com', 'Nome do Enviador', 'Assunto do Email', $Vai)) {
+ if (smtpmailer('cafestg@gmail.com.br', 'enviador@gmail.com', 'Nome do Enviador', 'Assunto do Email', $Vai)) {
 
 	Header("location:http://www.dominio.com.br/obrigado.html"); // Redireciona para uma página de obrigado.
 
